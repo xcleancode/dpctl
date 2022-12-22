@@ -68,6 +68,8 @@ cdef api class usm_ndarray [object PyUSMArrayObject, type PyUSMArrayType]:
     cdef int get_typenum(self)
     cdef int get_itemsize(self)
     cdef int get_flags(self)
+    cdef void set_flag(self, int mask)
+    cdef void unset_flag(self, int mask)
     cdef object get_base(self)
     cdef dpctl.DPCTLSyclQueueRef get_queue_ref(self) except *
     cdef dpctl.SyclQueue get_sycl_queue(self)

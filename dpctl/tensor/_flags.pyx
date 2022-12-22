@@ -128,6 +128,21 @@ cdef class Flags:
             return self.fc
         elif name == "CONTIGUOUS":
             return self.forc
+        else:
+            raise KeyError(
+                "Unknown flag `{}`".format(name)
+            )
+
+    def __setitem__(self, name, val):
+        if name in ["WRITABLE", "W"]:
+            if val:
+                self.arr_.set_flag(USM_ARRAY_WRITABLE)
+            else:
+                self.arr_.unset_flag(USM_ARRAY_WRITABLE)
+        else:
+            raise KeyError(
+                "Flag `{}` unknown or cannot be set".format(name)
+            )
 
     def __repr__(self):
         out = []

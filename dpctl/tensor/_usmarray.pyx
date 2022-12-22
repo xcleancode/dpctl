@@ -110,7 +110,7 @@ cdef class usm_ndarray:
     new device memory by calling respective constructor with
     the specified `buffer_ctor_kwrds`; `buffer` can be an
     instance of :class:`dpctl.memory.MemoryUSMShared`,
-    :class:`dpctl.memory.MemoryUSMDevice`, or
+    :class:`dpctl.memory.MemoryUSMDevice`, o
     :class:`dpctl.memory.MemoryUSMHost`; `buffer` can also be
     another usm_ndarray instance, in which case its underlying
     MemoryUSM* buffer is used for buffer.
@@ -322,8 +322,16 @@ cdef class usm_ndarray:
         return type_bytesize(self.typenum_)
 
     cdef int get_flags(self):
-        """Returns flags of this array"""
+        """Returns integer flags of this array"""
         return self.flags_
+
+    cdef void set_flag(self, int mask):
+        """Sets the binary array flag given by `mask`"""
+        self.flags_ |= mask
+
+    cdef void unset_flag(self, int mask):
+        """Unsets the binary array flag given by `mask`"""
+        self.flags_ &= ~mask
 
     cdef object get_base(self):
         """Returns the object owning the USM data addressed by this array"""
@@ -641,7 +649,7 @@ cdef class usm_ndarray:
             buffer=self.base_,
             offset=_meta[2]
         )
-        res.flags_ |= (self.flags_ & USM_ARRAY_WRITABLE)
+        res.flags_ ^= (~self.flags_ & USM_ARRAY_WRITABLE)
         res.array_namespace_ = self.array_namespace_
         return res
 
@@ -953,7 +961,8 @@ cdef class usm_ndarray:
             _copy_from_numpy_into,
             _copy_from_usm_ndarray_to_usm_ndarray,
         )
-        if ((<usm_ndarray> Xv).flags_ & USM_ARRAY_WRITABLE) == 0:
+        cdef usm_ndarray ary = <usm_ndarray>Xv
+        if (ary.flags_ & USM_ARRAY_WRITABLE) == 0:
             raise ValueError("Can not modify read-only array.")
         if isinstance(val, usm_ndarray):
             _copy_from_usm_ndarray_to_usm_ndarray(Xv, val)
@@ -1217,7 +1226,7 @@ cdef usm_ndarray _transpose(usm_ndarray ary):
         order=('F' if (ary.flags_ & USM_ARRAY_C_CONTIGUOUS) else 'C'),
         offset=ary.get_offset()
     )
-    r.flags_ |= (ary.flags_ & USM_ARRAY_WRITABLE)
+    r.flags_ ^= (~ary.flags_ & USM_ARRAY_WRITABLE)
     return r
 
 
@@ -1234,7 +1243,7 @@ cdef usm_ndarray _m_transpose(usm_ndarray ary):
         order=('F' if (ary.flags_ & USM_ARRAY_C_CONTIGUOUS) else 'C'),
         offset=ary.get_offset()
     )
-    r.flags_ |= (ary.flags_ & USM_ARRAY_WRITABLE)
+    r.flags_ ^= (~ary.flags_ & USM_ARRAY_WRITABLE)
     return r
 
 
