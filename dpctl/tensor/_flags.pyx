@@ -75,6 +75,13 @@ cdef class Flags:
         """
         return _check_bit(self.flags_, USM_ARRAY_WRITABLE)
 
+    @writable.setter
+    def writable(self, val):
+        if val:
+            self.arr_.set_flag(USM_ARRAY_WRITABLE)
+        else:
+            self.arr_.unset_flag(USM_ARRAY_WRITABLE)
+
     @property
     def fc(self):
         """
