@@ -43,6 +43,7 @@ from dpctl.tensor._ctors import (
 )
 from dpctl.tensor._device import Device
 from dpctl.tensor._dlpack import from_dlpack
+from dpctl.tensor._indexing_functions import take
 from dpctl.tensor._manipulation_functions import (
     broadcast_arrays,
     broadcast_to,
@@ -134,6 +135,7 @@ __all__ = [
     "can_cast",
     "result_type",
     "meshgrid",
+    "take",
     "get_print_options",
     "set_print_options",
     "print_options",
